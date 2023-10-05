@@ -3,6 +3,8 @@ Code for the CIKM'23 paper "A Retrieve-and-Read Framework for Knowledge Graph Li
 
 <!-- Code will be released soon. -->
 
+![A Retrieve-and-Read Framework for Knowledge Graph Link Prediction (KG-R3)](./assets/KG-R3.png)
+
 # Install dependencies
 1. Create a new conda virtual env
 
@@ -60,7 +62,7 @@ python eval.py --dataset-path data/FB15K-237/ --cuda \
 
 ## WN18RR
 
-### train on 2 GPUs, per-GPU batch size=256
+### train, BS=512
 ```
 python -u main.py --dataset-path data/WN18RR/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
