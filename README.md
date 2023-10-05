@@ -3,7 +3,7 @@ Code for the CIKM'23 paper "A Retrieve-and-Read Framework for Knowledge Graph Li
 
 <!-- Code will be released soon. -->
 
-![A Retrieve-and-Read Framework for Knowledge Graph Link Prediction (KG-R3)](./assets/KG-R3.pdf)
+![A Retrieve-and-Read Framework for Knowledge Graph Link Prediction (KG-R3)](./assets/KG-R3.png)
 
 ## Install dependencies
 1. Create a new conda virtual env
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## Download data
 
-Download the preprocessed subgraphs and KG triples from [this link](https://buckeyemailosu-my.sharepoint.com/:f:/g/personal/pahuja_9_buckeyemail_osu_edu/ErHNYjTAzLZMgT7Mkgy1J_4BeoJMYTF4EQ2UxniOgPhCyA?e=85avhJ)
+Download the preprocessed subgraphs and KG triples from [this link](https://buckeyemailosu-my.sharepoint.com/:f:/g/personal/pahuja_9_buckeyemail_osu_edu/ErHNYjTAzLZMgT7Mkgy1J_4BeoJMYTF4EQ2UxniOgPhCyA?e=85avhJ) from respective directories `FB15K-237` and `WN18RR` are place them in a `data/` directory.
 
 ## Preprocess data
 
