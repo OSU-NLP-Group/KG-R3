@@ -1,0 +1,9 @@
+torch==1.10.0+cu102
+lmdb==0.98
+transformers==4.8.2
+networkx==2.2
+numpy==1.19.2
+scipy==1.5.2
+dgl==0.4.3post2
+matplotlib==3.3.4
+pytorch_pretrained_bert==0.6.1
