@@ -5,7 +5,7 @@ Code for the CIKM'23 paper "A Retrieve-and-Read Framework for Knowledge Graph Li
 
 ![A Retrieve-and-Read Framework for Knowledge Graph Link Prediction (KG-R3)](./assets/KG-R3.pdf)
 
-# Install dependencies
+## Install dependencies
 1. Create a new conda virtual env
 
 2. Install horovod
@@ -18,10 +18,13 @@ HOROVOD_WITH_PYTORCH=1 --no-cache-dir --ignore-installed pip install horovod[pyt
 pip install -r requirements.txt
 ```
 
-# Download data
+## Download data
 
-# Preprocess data
-## pickle dataloader batches for faster training
+Download the preprocessed subgraphs and KG triples from [this link](https://buckeyemailosu-my.sharepoint.com/:f:/g/personal/pahuja_9_buckeyemail_osu_edu/ErHNYjTAzLZMgT7Mkgy1J_4BeoJMYTF4EQ2UxniOgPhCyA?e=85avhJ)
+
+## Preprocess data
+
+### pickle dataloader batches for faster training
 ```
 python -u dump_preproc_data.py --dataset-path data/FB15K-237/ \
 --sampling-type minerva \
@@ -29,11 +32,11 @@ python -u dump_preproc_data.py --dataset-path data/FB15K-237/ \
 --graph-connection type_1 --split train --mode train
 ```
 
-# Experiments
+## Experiments
 
-## FB15K-237
+### FB15K-237
 
-### train, BS=512, Minerva retriever
+#### train, BS=512, Minerva retriever
 ```
 python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
@@ -43,7 +46,7 @@ python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
 ```
 
-### evaluate on validation split
+#### evaluate on validation split
 ```
 python eval.py --dataset-path data/FB15K-237/ --cuda \
 --ckpt-path ckpts/CKPT_DIR/model.pt \
@@ -51,7 +54,7 @@ python eval.py --dataset-path data/FB15K-237/ --cuda \
 --graph-connection type_1 --embed-dim 320 --n-attn-heads 8 \
 --n-bert-layers 3
 ```
-### evaluate on test split
+#### evaluate on test split
 ```
 python eval.py --dataset-path data/FB15K-237/ --cuda \
 --ckpt-path ckpts/CKPT_DIR/model.pt \
@@ -60,9 +63,9 @@ python eval.py --dataset-path data/FB15K-237/ --cuda \
 --n-bert-layers 3
 ```
 
-## WN18RR
+### WN18RR
 
-### train, BS=512
+#### train, BS=512
 ```
 python -u main.py --dataset-path data/WN18RR/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
