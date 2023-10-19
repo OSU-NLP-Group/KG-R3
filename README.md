@@ -53,7 +53,10 @@ python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --n-epochs 300 --optimizer-type adamax --patience 20 \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
 ```
-- For BFS and one-hop neighborhood retrievers, change the `sampling-type` argument to `bfs` and `onehop` respectively.
+- For BFS retriever (FB15K-237 dataset), set `--sampling-type bfs --sample-size 100 --neigh-size 10`
+- For BFS retriever (WN18RR dataset), set `--sampling-type bfs --sample-size 30 --neigh-size 10`
+- For one-hop neighborhood retriever (FB15K-237 dataset), set `--sampling-type onehop --sample-size 50`
+- For one-hop neighborhood retriever (WN18RR dataset), set `--sampling-type onehop --sample-size 12`
 
 ### WN18RR
 
