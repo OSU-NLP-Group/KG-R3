@@ -33,12 +33,15 @@ Download the preprocessed subgraphs and KG triples from [this link](https://buck
 ## Preprocess data
 
 ### pickle dataloader batches for faster training
+
+#### FB15K-237, Minerva retriever
 ```
 python -u dump_preproc_data.py --dataset-path data/FB15K-237/ \
 --sampling-type minerva \
---batch-size 512 --out-dir data/FB15K-237/train_preproc/ \
---graph-connection type_1 --split train --mode train
+--batch-size 256 --out-dir data/FB15K-237/train_preproc/ \
+--graph-connection type_1 --split train
 ```
+- For WN18RR, set `--batch-size 512 --beam-size 40 --add-segment-embed --add-inverse-rels`
 
 ## Training
 
@@ -54,9 +57,9 @@ python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
 ```
 - For BFS retriever (FB15K-237 dataset), set `--sampling-type bfs --sample-size 100 --neigh-size 10`
-- For BFS retriever (WN18RR dataset), set `--sampling-type bfs --sample-size 30 --neigh-size 10`
+- For BFS retriever (WN18RR dataset), set `--sampling-type bfs --sample-size 30 --neigh-size 10 --lr 0.001`
 - For one-hop neighborhood retriever (FB15K-237 dataset), set `--sampling-type onehop --sample-size 50`
-- For one-hop neighborhood retriever (WN18RR dataset), set `--sampling-type onehop --sample-size 12`
+- For one-hop neighborhood retriever (WN18RR dataset), set `--sampling-type onehop --sample-size 12 --lr 0.0004`
 
 ### WN18RR
 
