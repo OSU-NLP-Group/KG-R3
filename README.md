@@ -5,6 +5,14 @@ Code for the CIKM'23 paper ["A Retrieve-and-Read Framework for Knowledge Graph L
 
 ![A Retrieve-and-Read Framework for Knowledge Graph Link Prediction (KG-R3)](./assets/KG-R3.png)
 
+## KG Link Prediction Results
+
+|  Dataset  |   MRR  | HITS@1 | HITS@3 | HITS@10 |
+|:---------:|:------:|:------:|:------:|:-------:|
+| FB15K-237 | .390   | .315   | .413   | .539    |
+| WN18RR    | .472   | .439   | .481   | .537    |
+
+
 ## Install dependencies
 1. Create a new conda virtual env
 
