@@ -80,7 +80,7 @@ python eval.py --dataset-path <DATA_PATH> --cuda \
 --ckpt-path ckpts/CKPT_DIR/model.pt \
 --split <valid/test> --sampling-type minerva \
 --graph-connection type_1 --embed-dim 320 --n-attn-heads 8 \
---n-bert-layers 3
+--n-bert-layers 3 [--beam-size <>] [--add-segment-embed] [--add-inverse-rels]
 ```
 
 

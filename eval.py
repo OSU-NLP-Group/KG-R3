@@ -5,27 +5,23 @@ import numpy as np
 from tqdm  import tqdm
 import json
 import random
-import networkx as nx
-import pickle
 
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
-from torch import optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from utils.gen_utils import *
-from dataset import SubGraphDataset, LinkPredSubGraphDataset
-from model_concat_fusion_single_level import GraphTransformer
-from pytorchtools import EarlyStopping
-from transformers.models.bert.modeling_bert import BertConfig
+from dataset import SubGraphDataset
+from dataset_eval import LinkPredSubGraphDataset
 
-# @profile
+from model_self_attn import GraphTransformer
+from model_cross_attn import GraphTransformer as GraphTransformerCrossAttn
+
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--dataset-path', type=str, required=True)
 	parser.add_argument('--split', type=str, choices=['train', 'valid', 'test'], default='valid')
+	parser.add_argument('--model-type', type=str, choices=['self-attn', 'cross-attn'], default='cross-attn')
 	parser.add_argument('--ckpt-path', type=str, required=True)
 	parser.add_argument('--sample-size', type=int, default=20, help='sample size in terms of no. of edges')
 	parser.add_argument('--embed-dim', type=int, default=768, help='embedding dim.')
@@ -38,13 +34,14 @@ def main():
 	parser.add_argument('--graph-connection', type=str, choices=['type_1', 'type_2'], default='type_3')
 	parser.add_argument('--sampling-type', type=str, choices=['bfs', 'rwr', 'khop', 'bfs-complete', 'minerva'], default='rwr')
 	parser.add_argument('--seed', type=int, default=231327)
-	parser.add_argument('--num-workers', type=int, default=1, help='no. of dataloader workers')
 	parser.add_argument('--beam-size', type=int, default=100, help='beam size for Minerva model decoding')
-	parser.add_argument("--n-cand-samples", type=int, default=-1, help="No. of candidate samples. if -1, use entire entity set")
 	parser.add_argument('--debug', action='store_true')
 	parser.add_argument("--add-segment-embed", action="store_true", default=False)
 	parser.add_argument('--add-inverse-rels', action='store_true', help='add inverse relations for query tower')
-
+	parser.add_argument('--label-smoothing', type=float, default=0.0)
+	parser.add_argument('--hidden-dropout-prob', type=float, default=0.1)
+	parser.add_argument('--attention-probs-dropout-prob', type=float, default=0.1)
+	
 	# Bert model args
 	parser.add_argument('--n-attn-heads', type=int, default=2)
 	parser.add_argument('--n-bert-layers', type=int, default=2)
@@ -58,15 +55,6 @@ def main():
 	np.random.seed(args.seed)
 	random.seed(args.seed)
 
-	config = BertConfig()
-
-	config.hidden_size = args.embed_dim
-	config.num_hidden_layers = args.n_bert_layers
-	config.num_attention_heads = args.n_attn_heads
-	config.sampling_type = args.sampling_type
-
-	print('config = {}'.format(config))
-
 	dataset = SubGraphDataset(args.dataset_path, 'train', args.neigh_size, args.sampling_type, args.graph_connection, device, False, args)
 
 	my_collator_eval = MyCollatorCustom(dataset.triples_dataset.entity2id['<pad>'], dataset.triples_dataset.relation2id['<pad>'], include_edge=True, add_segment_embed=args.add_segment_embed)
@@ -77,7 +65,10 @@ def main():
 	val_dataset_tail = LinkPredSubGraphDataset(args.dataset_path, args.split, 'tail', args.sample_size, args.neigh_size, args.sampling_type, args.graph_connection, device, args)
 	val_dataloader_tail = DataLoader(val_dataset_tail, batch_size=16, collate_fn=my_collator_eval)
 
-	model = GraphTransformer(config, dataset.num_entities, dataset.num_relations, config.hidden_size, args).to(device)
+	if args.model_type == 'self-attn':
+		model = GraphTransformer(dataset.num_entities, dataset.num_relations, args).to(device)
+	else:
+		model = GraphTransformerCrossAttn(dataset.num_entities, dataset.num_relations, args).to(device)
 
 	model.load_state_dict(torch.load(args.ckpt_path), strict=False)
 	model.eval()
@@ -102,18 +93,7 @@ def main():
 				outputs = model(input_ids=batch['input_ids'].to(device), attention_mask=batch['attention_mask'].to(device), token_type_ids=batch['token_type_ids'].to(device), ent_masked_lm_labels=batch['ent_masked_lm_labels'].to(device), ent_len_tensor=batch['ent_len_tensor'].to(device), ent_ids=batch['ent_ids'].to(device), rel_ids=batch['rel_ids'].to(device), segment_ids=batch['segment_ids'].to(device))
 
 			pred = outputs['ent_logits'].squeeze(1)
-			
-			if args.n_cand_samples>0:
-				candidate_ent = random.sample(range(dataset.triples_dataset.n_entities), args.n_cand_samples)
-				candidate_ent = list(set(candidate_ent + [sub.item()]))
-				non_candidate_ent = list(set(range(dataset.triples_dataset.n_entities)) - set(candidate_ent))
 
-			# print('pred = {}'.format(pred.size()))
-			if args.n_cand_samples>0:
-				pred[0, non_candidate_ent] = -10000000
-			# print('pred = {}'.format(pred))
-			# print('len(pred==-10000000) = {}'.format(torch.sum(pred[0, :]==-10000000)))
-			
 			b_range			= torch.arange(pred.size()[0], device=device)
 			target_pred		= pred[b_range, sub] # get score of tail ent in (sub, rel, obj) triple [batch]
 			pred 			= torch.where(label.byte(), -torch.ones_like(pred) * 10000000, pred) # [batch, num_ent] at indices which corr to 'sub' position, put a big negative no. AT other places it remains unchanged.
@@ -151,14 +131,6 @@ def main():
 				outputs = model(input_ids=batch['input_ids'].to(device), attention_mask=batch['attention_mask'].to(device), token_type_ids=batch['token_type_ids'].to(device), ent_masked_lm_labels=batch['ent_masked_lm_labels'].to(device), ent_len_tensor=batch['ent_len_tensor'].to(device), ent_ids=batch['ent_ids'].to(device), rel_ids=batch['rel_ids'].to(device), segment_ids=batch['segment_ids'].to(device))
 			
 			pred = outputs['ent_logits'].squeeze(1)
-
-			if args.n_cand_samples>0:
-				candidate_ent = random.sample(range(dataset.triples_dataset.n_entities), args.n_cand_samples)
-				candidate_ent = list(set(candidate_ent + [obj.item()]))
-				non_candidate_ent = list(set(range(dataset.triples_dataset.n_entities)) - set(candidate_ent))
-
-			if args.n_cand_samples>0:
-				pred[0, non_candidate_ent] = -10000000
 
 			b_range			= torch.arange(pred.size()[0], device=device)
 			target_pred		= pred[b_range, obj] # get score of tail ent in (sub, rel, obj) triple [batch]
