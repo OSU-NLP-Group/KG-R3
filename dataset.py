@@ -163,7 +163,6 @@ class SubGraphDataset(Dataset):
 						try:
 							str_id = '{:08}'.format(idx).encode('ascii')
 							n1, n2, r_label, nodes, edges, ent_segment_scores = deserialize_seg(txn.get(str_id)).values()
-							# print('fw_edges = {}'.format(fw_edges))
 						except:
 							edges = []
 
@@ -304,6 +303,84 @@ class SubGraphDataset(Dataset):
 	def __len__(self):
 		return len(self.triples) * 2
 
+class SimpleLinkPredSubGraphDataset(Dataset):
+	def __init__(self, dataset_path, split, mode, neigh_size, sampling_type, graph_connection, device):
+		super(SimpleLinkPredSubGraphDataset, self).__init__()
+		self.dataset_path = dataset_path
+		self.split = split
+		self.mode = mode
+		self.neigh_size = neigh_size
+		self.sampling_type = sampling_type
+		self.graph_connection = graph_connection
+		self.device = device
+
+		# initialize dataset of KG triples
+		self.triples_dataset = KGDataset(self.dataset_path)
+
+		# add [MASK] token to entity vocab
+		self.triples_dataset.entity2id['<mask>'] = len(self.triples_dataset.entity2id)
+
+		# add [MASK] token to relation vocab
+		self.triples_dataset.relation2id['<mask>'] = len(self.triples_dataset.relation2id)
+
+		self.triples_dataset.entity2id['<pad>'] = len(self.triples_dataset.entity2id)
+
+		# add [PAD] token to relation vocab
+		self.triples_dataset.relation2id['<pad>'] = len(self.triples_dataset.relation2id)
+
+		self.triples_dataset.id2entity = {v:k for k,v in self.triples_dataset.entity2id.items()}
+		self.triples_dataset.id2relation = {v:k for k,v in self.triples_dataset.relation2id.items()}
+
+		# build adj list and calculate degrees for sampling
+		self.num_nodes = len(self.triples_dataset.entity2id)
+		self.num_entities = len(self.triples_dataset.entity2id)
+		self.num_relations = len(self.triples_dataset.relation2id)
+
+		self.train_data = self.triples_dataset.train
+		self.valid_data = self.triples_dataset.valid
+		self.test_data = self.triples_dataset.test
+
+		if self.split == 'train':
+			self.triples = self.train_data
+		elif self.split == 'valid':
+			self.triples = self.valid_data
+		else:
+			self.triples = self.test_data
+
+		self.triples_dataset.train = np.asarray(self.triples_dataset.train)
+		self.triples_dataset.valid = np.asarray(self.triples_dataset.valid)
+
+	def __getitem__(self, idx):
+		edge = self.triples[idx]
+		# print('edge = {}'.format(edge))
+
+		if self.mode == 'head': # head is corrupted
+			central_node = edge[2]
+			masked_node = edge[0]
+
+			label = self.get_label(self.triples_dataset.or2s_all[(edge[2], edge[1])])
+		else: # tail is corrupted
+			central_node = edge[0]
+			masked_node = edge[2]
+
+			label = self.get_label(self.triples_dataset.sr2o_all[(edge[0], edge[1])])
+
+		data = {
+					'edge': edge,
+					'label': label.to(self.device),
+				}
+
+		return data
+
+	def get_label(self, label):
+		y = np.zeros([self.triples_dataset.n_entities], dtype=np.float32)
+		for e2 in label:
+			y[e2] = 1.0
+
+		return torch.FloatTensor(y)
+
+	def __len__(self):
+		return len(self.triples)
 
 class KGDataset:
 	'''Load a knowledge graph

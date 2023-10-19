@@ -17,9 +17,7 @@ import horovod.torch as hvd
 from hvd_optimizer import DistributedOptimizer
 
 from utils.gen_utils import *
-# from dataset import SubGraphDataset, LinkPredSubGraphDataset
 from dataset import SubGraphDataset
-# from dataset_orig import LinkPredSubGraphDataset as LinkPredSubGraphDataset_orig
 from dataset_eval import LinkPredSubGraphDataset
 
 from model_self_attn import GraphTransformer

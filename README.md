@@ -30,6 +30,10 @@ pip install -r requirements.txt
 
 Download the preprocessed subgraphs and KG triples from [this link](https://buckeyemailosu-my.sharepoint.com/:f:/g/personal/pahuja_9_buckeyemail_osu_edu/ErHNYjTAzLZMgT7Mkgy1J_4BeoJMYTF4EQ2UxniOgPhCyA?e=85avhJ) from respective directories `FB15K-237` and `WN18RR` are place them in a `data/` directory.
 
+## Dump retriever subgraphs (optional)
+
+- Follow the steps in dump_subgraphs.md for details
+
 ## Preprocess data
 
 ### pickle dataloader batches for faster training
