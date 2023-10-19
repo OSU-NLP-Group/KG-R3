@@ -33,13 +33,14 @@ def main():
 	parser.add_argument('--debug', action='store_true')
 	parser.add_argument('--add-segment-embed', action='store_true', help='add segment embedding for triple vs context')
 
-	# args for gold subgraph
 	parser.add_argument("--hop", type=int, default=3, help="Enclosing subgraph hop number")
 	parser.add_argument('--enclosing_sub_graph', '-en', type=bool, default=True, help='whether to only consider enclosing subgraph')
 	parser.add_argument("--max_nodes_per_hop", "-max_h", type=int, default=None, help="if > 0, upper bound the # nodes per hop by subsampling")
 	parser.add_argument("--n-neigh-per-node", type=int, default=None, help="if > 0, upper bound the # neigh nodes per node")
 	parser.add_argument("--max_nodes_int", type=int, default=None, help="limit on max. no. of nodes in intersection")
 	parser.add_argument("--prune-subgraph", action='store_true', default=True)
+	parser.add_argument('--beam-size', type=int, default=100, help='beam size for Minerva model decoding')
+	parser.add_argument('--add-inverse-rels', action='store_true', help='add inverse relations for query tower')
 
 	args = parser.parse_args()
 
@@ -51,12 +52,12 @@ def main():
 	random.seed(args.seed)
 
 	# dataset without stat mode
-	dataset = SubGraphDataset(args.dataset_path, args.split, args.neigh_size, args.position_enc_type, args.sampling_type, args.pos_enc_dim, args.graph_connection, device, True, args)
+	dataset = SubGraphDataset(args.dataset_path, args.split, args.neigh_size, args.sampling_type, args.graph_connection, device, True, args)
 	train_dataset_lens = torch.tensor([sum(dataset[i]) for i in range(len(dataset))])
 	train_batch_sample_ids = torch.split(torch.argsort(train_dataset_lens, descending=args.use_descending), split_size_or_sections=args.batch_size)
 
-	dataset = SubGraphDataset(args.dataset_path, args.split, args.neigh_size, args.position_enc_type, args.sampling_type, args.pos_enc_dim, args.graph_connection, device, False, args)
-	my_collator = MyCollatorCustom(dataset.triples_dataset.entity2id['<pad>'], dataset.triples_dataset.relation2id['<pad>'], position_enc_type=args.position_enc_type)
+	dataset = SubGraphDataset(args.dataset_path, args.split, args.neigh_size, args.sampling_type, args.graph_connection, device, False, args)
+	my_collator = MyCollatorCustom(dataset.triples_dataset.entity2id['<pad>'], dataset.triples_dataset.relation2id['<pad>'], add_segment_embed=args.add_segment_embed)
 	dataloader = DataLoader(dataset, collate_fn=my_collator, batch_sampler=train_batch_sample_ids)
 	
 	# print(os.path.join(args.out_dir, '{}_{}_{}_{}_{}_{}'.format(args.sampling_type, args.graph_connection, args.position_enc_type, args.split, args.batch_size, args.adj_type)))
@@ -64,7 +65,7 @@ def main():
 
 	with torch.no_grad():
 		for batch_id, batch in enumerate(tqdm(dataloader)):
-			pickle.dump(batch, open(os.path.join(args.out_dir, '{}_{}_{}_{}_{}_{}'.format(args.sampling_type, args.graph_connection, args.position_enc_type, args.split, args.batch_size, args.adj_type), '{}.pkl'.format(batch_id)), 'wb'))
+			pickle.dump(batch, open(os.path.join(args.out_dir, '{}_{}_{}_{}_{}'.format(args.sampling_type, args.graph_connection, args.split, args.batch_size, args.beam_size), '{}.pkl'.format(batch_id)), 'wb'))
 
 			if batch_id>100 and args.debug:
 				break
