@@ -32,7 +32,7 @@ Download the preprocessed subgraphs and KG triples from [this link](https://buck
 
 ## Dump retriever subgraphs (optional)
 
-- Follow the steps in dump_subgraphs.md for details
+- Follow the steps in [dump_subgraphs.md](./dump_subgraphs.md) for details.
 
 ## Preprocess data
 
