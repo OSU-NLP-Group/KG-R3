@@ -4,7 +4,7 @@ import numpy as np
 import networkx as nx
 from utils.gen_utils import *
 from utils.graph_sampler import links2subgraphs
-from utils.graph_utils import deserialize, deserialize_prior, deserialize_seg, deserialize_dir, deserialize_seg_dir
+from utils.graph_utils import deserialize, deserialize_seg, deserialize_seg_dir
 from torch.utils.data import Dataset, Sampler
 from collections import defaultdict
 from scipy.sparse import csc_matrix
@@ -54,7 +54,6 @@ class LinkPredSubGraphDataset(Dataset):
 			self.triples = self.valid_data
 		else:
 			self.triples = self.test_data
-
 		
 		if self.sampling_type == 'minerva':
 			if not self.add_segment_embed:
@@ -131,12 +130,9 @@ class LinkPredSubGraphDataset(Dataset):
 		else:
 			raise NotImplementedError
 
-		# print('edges = {}'.format(edges))
 		if self.sampling_type in ['bfs', 'onehop', 'rwr', 'bfs-complete']: # bfs
 			edges = np.asarray([self.train_data[i] for i in edges])
 		elif self.sampling_type in ['minerva', 'min_0.25_gold_0.75', 'min_0.5_gold_0.5', 'min_0.75_gold_0.25']:
-			# print(type(edges))
-			# if not self.args.direction:
 			edges = list(edges)
 			
 					
@@ -159,13 +155,9 @@ class LinkPredSubGraphDataset(Dataset):
 				segment_ids = [0]
 			segment_ids = segment_ids + [0]*len(relations)
 
-		# entities = [self.triples_dataset.id2entity[x] for x in list(set(np.concatenate((head, tail)).tolist()))]
 		entities = [self.triples_dataset.id2entity[x] for x in entities]
 
-		# if not self.args.direction:
 		ent_graph = nx.Graph()
-		# else:
-			# ent_graph = nx.DiGraph()
 
 		for ent in entities:
 			if ent not in ent_graph.nodes:

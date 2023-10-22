@@ -72,11 +72,6 @@ class SubGraphDataset(Dataset):
 		self.triples_dataset.valid = np.asarray(self.triples_dataset.valid)
 		self.triples_dataset.test = np.asarray(self.triples_dataset.test)
 
-		self.adj_mat_list = []
-		for i in range(len(self.triples_dataset.relation2id)):
-			idx = np.argwhere(self.triples_dataset.train[:, 1] == i)
-			self.adj_mat_list.append(csc_matrix((np.ones(len(idx), dtype=np.uint8), (self.triples_dataset.train[:, 0][idx].squeeze(1), self.triples_dataset.train[:, 2][idx].squeeze(1))), shape=(len(self.triples_dataset.entity2id), len(self.triples_dataset.entity2id))))
-
 		if self.args.sampling_type == 'bfs':
 			self.db_path = os.path.join(self.dataset_path, f'subgraphs_samplesize_{args.sample_size}_neigh_size_{args.neigh_size}_{self.split}')
 		elif self.args.sampling_type == 'onehop':
@@ -108,7 +103,7 @@ class SubGraphDataset(Dataset):
 		# dump subgraphs in db
 		if not os.path.exists(self.db_path):
 			# dump pickled graphs in db
-			links2subgraphs(self.adj_mat_list, self.adj_list, self.graphs, self.db_path, self.triples_dataset, self.train_data, args)
+			links2subgraphs(self.adj_list, self.graphs, self.db_path, self.triples_dataset, self.train_data, args)
 		
 		if self.args.sampling_type in ['bfs', 'onehop']:
 			print('db dumping finished...')
@@ -181,14 +176,11 @@ class SubGraphDataset(Dataset):
 			# head is corrupted
 			masked_node = n1
 			central_node = edge[2]
-			# edge_masked = (self.triples_dataset.entity2id['<mask>'], edge[1], edge[2])
 		else:
 			# tail is corrupted
 			masked_node = n2
 			central_node = edge[0]
-			# edge_masked = (edge[0], edge[1], self.triples_dataset.entity2id['<mask>'])
 
-		# print(edges)
 		edges = np.asarray(edges)
 
 		# retrieve nodes and relations in the subgraph (these comprise the sequence)
@@ -246,9 +238,6 @@ class SubGraphDataset(Dataset):
 			adj = adj + np.eye(adj.shape[0], dtype=int)
 		else:
 			adj = np.ones((len(entities)+len(relations), len(entities)+len(relations)), dtype=int)
-
-		# print('adj = {}'.format(adj.shape))
-		# print('adj = {}'.format(adj))
 
 		adj = adj.tolist()
 		
