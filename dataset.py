@@ -15,10 +15,7 @@ from copy import deepcopy
 class SubGraphDataset(Dataset):
 	def __init__(self, dataset_path, split, neigh_size, sampling_type, graph_connection, device, stat_mode, args, include_edges=False):
 		super(SubGraphDataset, self).__init__()
-		'''
-		For each query edge, have that edge as isolated and use the sampled subgraph obtained from k-hop intersection. The masked entity has two identities. Only a single entity is masked here.
-		The attention matrix connects query entity to relation and relation to its other end. rest all are zero
-		'''
+
 		self.dataset_path = dataset_path
 		self.split = split
 		self.neigh_size = neigh_size
@@ -49,11 +46,6 @@ class SubGraphDataset(Dataset):
 		self.train_data = self.triples_dataset.train
 		self.valid_data = self.triples_dataset.valid
 		self.test_data = self.triples_dataset.test
-
-		if os.path.exists(os.path.join(self.dataset_path, 'mid2title_fb15k.json')):
-			self.mid2title = json.load(open(os.path.join(self.dataset_path, 'mid2title_fb15k.json')))
-		else:
-			self.mid2title = None
 
 		if self.split == 'train':
 			self.triples = self.train_data
@@ -117,7 +109,7 @@ class SubGraphDataset(Dataset):
 		# dump subgraphs in db
 		if not os.path.exists(self.db_path):
 			# dump pickled graphs in db
-			links2subgraphs(self.adj_mat_list, self.adj_list, self.graphs, self.db_path, self.triples_dataset, self.train_data, self.mid2title, args)
+			links2subgraphs(self.adj_mat_list, self.adj_list, self.graphs, self.db_path, self.triples_dataset, self.train_data, args)
 		
 		if self.args.sampling_type in ['bfs', 'onehop']:
 			print('db dumping finished...')

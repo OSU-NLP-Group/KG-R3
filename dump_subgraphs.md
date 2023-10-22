@@ -38,3 +38,10 @@ python dump_minerva_subgraphs_segment.py --dataset-path ../data/WN18RR/ --path-d
 python dump_minerva_subgraphs_segment.py --dataset-path ../data/WN18RR/ --path-dir MINERVA_MODEL_DIR/train_beam --db-path ../data/WN18RR/subgraphs_minerva_beam_40_seg_train_rev --split train --reverse
 python dump_minerva_subgraphs_segment.py --dataset-path ../data/WN18RR/ --path-dir MINERVA_MODEL_DIR/dev_beam --db-path ../data/WN18RR/subgraphs_minerva_beam_40_seg_valid_rev --split valid --reverse
 ```
+
+## BFS Retriever
+If the BFS subgraphs corresponding to the given hyperparameters are not found in the path, the code will auto-generate them while running the main training script (method `links2subgraphs()` in dataset.py)
+
+## One-hop Retriever
+If the one-hop subgraphs corresponding to the given hyperparameters are not found in the path, the code will auto-generate them while running the main training script (method `links2subgraphs()` in dataset.py)
+

@@ -15,11 +15,11 @@ import sys
 import torch
 from scipy.special import softmax
 from utils.dgl_utils import _bfs_relational
-from utils.graph_utils import incidence_matrix, remove_nodes, ssp_to_torch, serialize, deserialize, get_edge_count, diameter, radius
+from utils.graph_utils import incidence_matrix, remove_nodes, ssp_to_torch, serialize, deserialize
 import networkx as nx
 from utils.gen_utils import sample_subgraph_with_central_node_bfs, sample_subgraph_with_central_node_onehop
 
-def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2title, params):
+def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, params):
 	'''
 	extract enclosing subgraphs, write map mode + named dbs
 	'''
@@ -28,7 +28,7 @@ def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2
 	enc_ratios = []
 	num_pruned_nodes = []
 
-	BYTES_PER_DATUM = get_average_subgraph_size(100, list(graphs.values())[0]['pos'], A, adj_list, triples_dataset, triples, mid2title, params) * 1.5
+	BYTES_PER_DATUM = get_average_subgraph_size(100, list(graphs.values())[0]['pos'], A, adj_list, triples_dataset, triples, params) * 1.5
 	links_length = 0
 	for split_name, split in graphs.items():
 		links_length += (len(split['pos'])) * 2
@@ -42,7 +42,7 @@ def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2
 	num_entities = len(triples_dataset.entity2id)
 
 	for idx in tqdm(range(num_entities)):
-		nei_tuples = get_neighbor_nodes(set([idx]), A_incidence, adj_list, params.hop, params.max_nodes_per_hop, params.n_neigh_per_node, triples_dataset, mid2title)
+		nei_tuples = get_neighbor_nodes(set([idx]), A_incidence, adj_list, params.hop, params.max_nodes_per_hop, params.n_neigh_per_node, triples_dataset)
 		neigh_dict[idx] = set([x[1] for x in nei_tuples])
 
 	env = lmdb.open(db_path, map_size=map_size, max_dbs=6)
@@ -52,7 +52,7 @@ def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2
 		with env.begin(write=True, db=split_env) as txn:
 			txn.put('num_graphs'.encode(), (len(links)).to_bytes(int.bit_length(len(links)*2), byteorder='little'))
 		
-		with mp.Pool(processes=params.num_workers, initializer=intialize_worker, initargs=(A, adj_list, neigh_dict, triples_dataset, triples, mid2title, params)) as p:
+		with mp.Pool(processes=params.num_workers, initializer=intialize_worker, initargs=(A, adj_list, neigh_dict, triples_dataset, triples, params)) as p:
 			args_ = zip(range(len(links)*2), np.tile(links, (2,1)), [len(links)]*2*len(links))
 
 			for (str_id, datum) in tqdm(p.imap(extract_save_subgraph_bfs, args_), total=len(links)*2):
@@ -66,7 +66,7 @@ def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2
 		with env.begin(write=True, db=split_env) as txn:
 			txn.put('num_graphs'.encode(), (len(links)).to_bytes(int.bit_length(len(links)*2), byteorder='little'))
 		
-		with mp.Pool(processes=params.num_workers, initializer=intialize_worker, initargs=(A, adj_list, neigh_dict, triples_dataset, triples, mid2title, params)) as p:
+		with mp.Pool(processes=params.num_workers, initializer=intialize_worker, initargs=(A, adj_list, neigh_dict, triples_dataset, triples, params)) as p:
 			args_ = zip(range(len(links)*2), np.tile(links, (2,1)), [len(links)]*2*len(links))
 
 			for (str_id, datum) in tqdm(p.imap(extract_save_subgraph_onehop, args_), total=len(links)*2):
@@ -88,7 +88,7 @@ def links2subgraphs(A, adj_list, graphs, db_path, triples_dataset, triples, mid2
 		elif params.sampling_type == 'onehop':
 			extraction_helper_onehop(A, adj_list, split['pos'], split_env)
 
-def get_average_subgraph_size(sample_size, links, A, adj_list, triples_dataset, triples, mid2title, params):
+def get_average_subgraph_size(sample_size, links, A, adj_list, triples_dataset, triples, params):
 	total_size = 0
 	for (n1, r_label, n2) in tqdm(links[np.random.choice(len(links), sample_size)]):
 
@@ -129,13 +129,13 @@ def get_average_subgraph_size(sample_size, links, A, adj_list, triples_dataset, 
 	return total_size / sample_size
 
 
-def intialize_worker(A, adj_list, neigh_dict, triples_dataset, triples, mid2title, params):
-	global A_, adj_list_, neigh_dict_, params_, triples_dataset_, triples_, mid2title_
-	A_, adj_list_, neigh_dict_, params_, triples_dataset_, triples_, mid2title_ = A, adj_list, neigh_dict, params, triples_dataset, triples, mid2title
+def intialize_worker(A, adj_list, neigh_dict, triples_dataset, triples, params):
+	global A_, adj_list_, neigh_dict_, params_, triples_dataset_, triples__
+	A_, adj_list_, neigh_dict_, params_, triples_dataset_, triples__ = A, adj_list, neigh_dict, params, triples_dataset, triples
 
-def intialize_worker_neigh_dict(A_incidence, adj_list, hop, max_nodes_per_hop, n_neigh_per_node, triples_dataset, mid2title):
-	global A_incidence_, adj_list_, hop_, max_nodes_per_hop_, n_neigh_per_node_, triples_dataset_, mid2title_
-	A_incidence_, adj_list_, hop_, max_nodes_per_hop_, n_neigh_per_node_, triples_dataset_, mid2title_ = A_incidence, adj_list, hop, max_nodes_per_hop, n_neigh_per_node, triples_dataset, mid2title
+def intialize_worker_neigh_dict(A_incidence, adj_list, hop, max_nodes_per_hop, n_neigh_per_node, triples_dataset):
+	global A_incidence_, adj_list_, hop_, max_nodes_per_hop_, n_neigh_per_node_, triples_dataset__
+	A_incidence_, adj_list_, hop_, max_nodes_per_hop_, n_neigh_per_node_, triples_dataset__ = A_incidence, adj_list, hop, max_nodes_per_hop, n_neigh_per_node, triples_dataset
 
 def extract_save_subgraph_bfs(args_):
 	idx, (n1, r_label, n2), links_length = args_
@@ -187,8 +187,8 @@ def extract_save_subgraph_onehop(args_):
 
 	return (str_id, datum)
 
-def get_neighbor_nodes(roots, adj, adj_list, h=1, max_nodes_per_hop=None, n_neigh_per_node=None, triples_dataset=None, mid2title=None):
-	bfs_generator = _bfs_relational(adj, adj_list, roots, max_nodes_per_hop, n_neigh_per_node, triples_dataset, mid2title)
+def get_neighbor_nodes(roots, adj, adj_list, h=1, max_nodes_per_hop=None, n_neigh_per_node=None, triples_dataset=None=None):
+	bfs_generator = _bfs_relational(adj, adj_list, roots, max_nodes_per_hop, n_neigh_per_node, triples_dataset)
 	lvls = list()
 	for _ in range(h):
 		try:

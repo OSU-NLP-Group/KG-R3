@@ -57,13 +57,11 @@ python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
 --embed-dim 320 --n-attn-heads 8 --n-bert-layers 3 \
 --lr 1e-2 --warmup 0.1 --batch-size 512 \
---n-epochs 300 --optimizer-type adamax --patience 20 \
+--n-epochs 300 --patience 20 \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
 ```
 - For BFS retriever (FB15K-237 dataset), set `--sampling-type bfs --sample-size 100 --neigh-size 10`
-- For BFS retriever (WN18RR dataset), set `--sampling-type bfs --sample-size 30 --neigh-size 10 --lr 0.001`
 - For one-hop neighborhood retriever (FB15K-237 dataset), set `--sampling-type onehop --sample-size 50`
-- For one-hop neighborhood retriever (WN18RR dataset), set `--sampling-type onehop --sample-size 12 --lr 0.0004`
 
 ### WN18RR
 
@@ -73,10 +71,12 @@ python -u main.py --dataset-path data/WN18RR/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
 --embed-dim 320 --n-attn-heads 8 --n-bert-layers 3 \
 --lr 0.00175 --label-smoothing 0.1 --warmup 0.1 \
---batch-size 256 --n-epochs 500 --optimizer-type adamax \
+--batch-size 256 --n-epochs 500 \
 --patience 100 --beam-size 40 --add-segment-embed --add-inverse-rels \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
 ```
+- For BFS retriever (WN18RR dataset), set `--sampling-type bfs --sample-size 30 --neigh-size 10 --lr 0.001`
+- For one-hop neighborhood retriever (WN18RR dataset), set `--sampling-type onehop --sample-size 12 --lr 0.0004`
 
 ## Evaluation (specify split)
 ```

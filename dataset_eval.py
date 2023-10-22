@@ -48,11 +48,6 @@ class LinkPredSubGraphDataset(Dataset):
 
 		self.adj_list, self.degrees = get_adj_and_degrees(self.num_nodes, self.train_data)
 
-		if os.path.exists(os.path.join(self.dataset_path, 'mid2title_fb15k.json')):
-			self.mid2title = json.load(open(os.path.join(self.dataset_path, 'mid2title_fb15k.json')))
-		else:
-			self.mid2title = None
-
 		if self.split == 'train':
 			self.triples = self.train_data
 		elif self.split == 'valid':

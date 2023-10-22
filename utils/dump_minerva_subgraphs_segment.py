@@ -61,16 +61,12 @@ def parse_path_file(filename, dataset, dataset_path, triples, triple_id_to_subgr
 				if rel in ['NO_OP', 'PAD']:
 					continue
 
-				rel_direction = 'fw'
-
 				if dataset_path in ['data/FB15K-237/', 'data/YAGO3-10/', 'data/umls/', 'data/NELL-995/']:
 					if rel.startswith('_'):
 						rel = rel[1:]
-						rel_direction = 'bw'
 				if dataset_path == 'data/WN18RR/':
 					if rel.startswith('__'):
 						rel = rel[1:]
-						rel_direction = 'bw'
 						# print('flag 1')
 				rel = dataset.triples_dataset.relation2id[rel]
 

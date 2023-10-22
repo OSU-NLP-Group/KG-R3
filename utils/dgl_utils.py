@@ -5,14 +5,13 @@ import random
 """All functions in this file are from  dgl.contrib.data.knowledge_graph"""
 
 
-def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_node=None, triples_dataset=None, mid2title=None):
+def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_node=None, triples_dataset=None):
     """
     BFS for graphs.
     Modified from dgl.contrib.data.knowledge_graph to accomodate node sampling
     adj_list: contains (edge_id, node_id) pairs
     """
     # print('max_nodes_per_hop = {}'.format(max_nodes_per_hop))
-    # print('roots = {}'.format(', '.join([mid2title.get(triples_dataset.id2entity[x]) for x in roots])))
 
     visited = set()
     current_lvl = set(roots)
@@ -43,8 +42,6 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
             
             # node_samples = [x for x in adj_list[node] if x[1] not in visited]
 
-            # print('current node = {}'.format(mid2title.get(triples_dataset.id2entity[node], triples_dataset.id2entity[node])))
-            # print('discovered nodes = {}'.format(', '.join([mid2title.get(triples_dataset.id2entity[x[1]], triples_dataset.id2entity[x[1]]) for x in node_samples])))
             next_lvl.update(node_samples)
 
         # remove all nodes already covered
