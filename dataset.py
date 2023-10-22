@@ -64,7 +64,6 @@ class SubGraphDataset(Dataset):
 
 		# val data can be based on train graph or eval graph for MLM; while for link prediction, it is always train graph
 		self.adj_list, _ = get_adj_and_degrees(self.num_nodes, self.train_data)
-		# self.adj_list = get_adj(self.num_nodes, self.train_data)
 
 		# Code credit: https://github.com/kkteru/grail
 		# Construct the list of adjacency matrix each corresponding to each relation. Note that this is constructed only from the train data.

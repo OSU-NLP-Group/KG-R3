@@ -11,8 +11,6 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
     Modified from dgl.contrib.data.knowledge_graph to accomodate node sampling
     adj_list: contains (edge_id, node_id) pairs
     """
-    # print('max_nodes_per_hop = {}'.format(max_nodes_per_hop))
-
     visited = set()
     current_lvl = set(roots)
 
@@ -23,10 +21,6 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
         for v in current_lvl:
             visited.add(v)
 
-        # get all neighbors in next hop
-        # next_lvl = _get_neighbors(adj, adj_list, current_lvl) # next_level should contain (node id, edge_id) pairs
-        
-        # TODO: convert it to use adj_list instead of adj matrix
         next_lvl = set()
         for node in current_lvl:
             if n_neigh_per_node:
@@ -34,9 +28,7 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
             else:
                 n_edge_samples = len(adj_list[node])
 
-            # print('n_edge_samples = {}'.format(n_edge_samples))
-
-            # next_lvl.update([x for x in adj_list[node] if x[1] not in visited])
+            # remove all nodes already covered
             node_samples = [x for x in random.sample(adj_list[node].tolist(), n_edge_samples) if x[1] not in visited]
             node_samples = [tuple(x) for x in node_samples]
             
@@ -44,16 +36,13 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
 
             next_lvl.update(node_samples)
 
-        # remove all nodes already covered
-        # next_lvl -= visited  # set difference # implement set difference based on node ids
-
-        # TODO: support max_nodes_per_hop
+        # support max_nodes_per_hop
         if max_nodes_per_hop and max_nodes_per_hop < len(next_lvl):
             next_lvl = set(random.sample(next_lvl, max_nodes_per_hop))
 
         yield next_lvl
 
-        # TODO: select only node ids from next_lvl
+        # select only node ids from next_lvl
         current_lvl = set.union(set([x[1] for x in next_lvl]))
 
 

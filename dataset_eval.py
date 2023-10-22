@@ -90,7 +90,6 @@ class LinkPredSubGraphDataset(Dataset):
 
 		print(self.db_path)
 
-	# @profile
 	def __getitem__(self, idx):
 		edge = self.triples[idx]
 		# print('edge = {}'.format(edge))
