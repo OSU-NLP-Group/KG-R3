@@ -38,7 +38,9 @@ def _bfs_relational(adj, adj_list, roots, max_nodes_per_hop=None, n_neigh_per_no
             # print('n_edge_samples = {}'.format(n_edge_samples))
 
             # next_lvl.update([x for x in adj_list[node] if x[1] not in visited])
-            node_samples = [x for x in random.sample(adj_list[node], n_edge_samples) if x[1] not in visited]
+            node_samples = [x for x in random.sample(adj_list[node].tolist(), n_edge_samples) if x[1] not in visited]
+            node_samples = [tuple(x) for x in node_samples]
+            
             # node_samples = [x for x in adj_list[node] if x[1] not in visited]
 
             # print('current node = {}'.format(mid2title.get(triples_dataset.id2entity[node], triples_dataset.id2entity[node])))
