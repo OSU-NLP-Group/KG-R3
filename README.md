@@ -88,21 +88,18 @@ python eval.py --dataset-path <DATA_PATH> --cuda \
 
 ## Citation
 ```
-@inproceedings{DBLP:journals/corr/abs-2212-09724,
-  author       = {Vardaan Pahuja and
-                  Boshi Wang and
-                  Hugo Latapie and
-                  Jayanth Srinivasa and
-                  Yu Su},
-  title        = {A Retrieve-and-Read Framework for Knowledge Graph Link Prediction},
-  booktitle    = {Proceedings of the 32nd {ACM} International Conference on Information
-                  {\&} Knowledge Management},
-  journal      = {Conference on Information and Knowledge Managament (CIKM)},
-  year         = {2023},
-  url          = {https://arxiv.org/abs/2212.09724},
-  doi          = {10.48550/arXiv.2212.09724},
-  abbr = {CIKM},
-  publisher    = {{ACM}},
-  pdf={https://arxiv.org/abs/2212.09724}
+@inproceedings{10.1145/3583780.3614769,
+author = {Pahuja, Vardaan and Wang, Boshi and Latapie, Hugo and Srinivasa, Jayanth and Su, Yu},
+title = {A Retrieve-and-Read Framework for Knowledge Graph Link Prediction},
+year = {2023},
+isbn = {9798400701245},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3583780.3614769},
+doi = {10.1145/3583780.3614769},
+pages = {1992–2002},
+numpages = {11},
+location = {Birmingham, United Kingdom},
+series = {CIKM '23}
 }              
 ```
