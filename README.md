@@ -1,5 +1,5 @@
 # KG-R3
-Code for the CIKM'23 paper ["A Retrieve-and-Read Framework for Knowledge Graph Link Prediction"](https://arxiv.org/pdf/2212.09724.pdf)
+Code for the CIKM'23 paper ["A Retrieve-and-Read Framework for Knowledge Graph Link Prediction"](https://arxiv.org/pdf/2212.09724.pdf) [ACM link](https://dl.acm.org/doi/10.1145/3583780.3614769)
 
 <!-- Code will be released soon. -->
 
