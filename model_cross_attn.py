@@ -38,16 +38,13 @@ class GraphTransformer(nn.Module):
 			self.segment_embeddings = nn.Embedding(2, self.embed_dim)
 
 		# BERT config for subgraph self-attention encoder
-		# TODO: Remove no effect args if true
 		config = BertConfig(0, hidden_size=self.embed_dim,
-							num_hidden_layers=3,
-							num_attention_heads=8,
+							num_hidden_layers=args.n_bert_layers,
+							num_attention_heads=args.n_attn_heads,
 							intermediate_size=1280,
 							hidden_act='gelu',
 							hidden_dropout_prob=args.hidden_dropout_prob,
 							attention_probs_dropout_prob=args.attention_probs_dropout_prob,
-							max_position_embeddings=0,  # no effect
-							type_vocab_size=0,  # no effect
 							initializer_range=0.02)
 
 		# initialize subgraph self-attention encoder

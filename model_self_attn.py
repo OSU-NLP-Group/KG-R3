@@ -38,8 +38,8 @@ class GraphTransformer(nn.Module):
 			self.segment_embeddings = nn.Embedding(2, self.embed_dim)
 
 		config = BertConfig(0, hidden_size=self.embed_dim,
-							num_hidden_layers=3,
-							num_attention_heads=8,
+							num_hidden_layers=args.n_bert_layers,
+							num_attention_heads=args.n_attn_heads,
 							intermediate_size=1280,
 							hidden_act='gelu',
 							hidden_dropout_prob=args.hidden_dropout_prob,

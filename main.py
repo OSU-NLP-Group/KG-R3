@@ -39,13 +39,12 @@ class filesDataset(torch.utils.data.Dataset):
 	def __len__(self):
 		return self.length
 
-# TODO: better organize these examples
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--dataset-path', type=str, required=True)
 	parser.add_argument('--save-dir', type=str, required=True)
 	parser.add_argument('--ckpt-path', type=str, default=None)
-	parser.add_argument('--sample-size', type=int, default=20, help='sample size in terms of no. of edges')
+	parser.add_argument('--sample-size', type=int, default=20, help='sample size in terms of no. of edges of subgraph')
 	parser.add_argument('--embed-dim', type=int, default=320, help='embedding dim.')
 	parser.add_argument('--n-attn-heads', type=int, default=8)
 	parser.add_argument('--n-bert-layers', type=int, default=3)
@@ -79,7 +78,7 @@ def main():
 	parser.add_argument("--weight-decay", default=0.01, type=float, help="Weight decay for adamax optimizer")
 	parser.add_argument('--gradient-accum-steps', type=int, default=1)
 	parser.add_argument('--shuffle-batches', action='store_true')
-	parser.add_argument('--num-workers', type=int, default=8, help='no. of workers for dumping data in db')
+	parser.add_argument('--num-workers', type=int, default=8, help='no. of workers for dataloader')
 
 	args = parser.parse_args()
 
