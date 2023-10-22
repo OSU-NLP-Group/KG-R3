@@ -24,7 +24,9 @@ def main():
 	parser.add_argument('--model-type', type=str, choices=['self-attn', 'cross-attn'], default='cross-attn')
 	parser.add_argument('--ckpt-path', type=str, required=True)
 	parser.add_argument('--sample-size', type=int, default=20, help='sample size in terms of no. of edges')
-	parser.add_argument('--embed-dim', type=int, default=768, help='embedding dim.')
+	parser.add_argument('--embed-dim', type=int, default=320, help='embedding dim.')
+	parser.add_argument('--n-attn-heads', type=int, default=8)
+	parser.add_argument('--n-bert-layers', type=int, default=3)
 	parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
 	parser.add_argument('--beta', type=float, default=0.999, help='beta_2 of adam')
 	parser.add_argument('--cuda', action='store_true')
@@ -43,8 +45,7 @@ def main():
 	parser.add_argument('--attention-probs-dropout-prob', type=float, default=0.1)
 	
 	# Bert model args
-	parser.add_argument('--n-attn-heads', type=int, default=2)
-	parser.add_argument('--n-bert-layers', type=int, default=2)
+	
 
 	args = parser.parse_args()
 

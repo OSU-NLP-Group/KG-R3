@@ -46,7 +46,9 @@ def main():
 	parser.add_argument('--save-dir', type=str, required=True)
 	parser.add_argument('--ckpt-path', type=str, default=None)
 	parser.add_argument('--sample-size', type=int, default=20, help='sample size in terms of no. of edges')
-	parser.add_argument('--embed-dim', type=int, default=768, help='embedding dim.')
+	parser.add_argument('--embed-dim', type=int, default=320, help='embedding dim.')
+	parser.add_argument('--n-attn-heads', type=int, default=8)
+	parser.add_argument('--n-bert-layers', type=int, default=3)
 	parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
 	parser.add_argument('--warmup', type=float, default=0.1, help='percentage of steps for warmup')
 	parser.add_argument('--beta', type=float, default=0.999, help='beta_2 of adam')
@@ -78,10 +80,6 @@ def main():
 	parser.add_argument('--gradient-accum-steps', type=int, default=1)
 	parser.add_argument('--shuffle-batches', action='store_true')
 	parser.add_argument('--num-workers', type=int, default=8, help='no. of workers for dumping data in db')
-
-	# Bert model args
-	parser.add_argument('--n-attn-heads', type=int, default=8)
-	parser.add_argument('--n-bert-layers', type=int, default=3)
 
 	args = parser.parse_args()
 

@@ -55,7 +55,6 @@ python -u dump_preproc_data.py --dataset-path data/FB15K-237/ \
 ```
 python -u main.py --dataset-path data/FB15K-237/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
---embed-dim 320 --n-attn-heads 8 --n-bert-layers 3 \
 --lr 1e-2 --warmup 0.1 --batch-size 512 \
 --n-epochs 300 --patience 20 \
 --seed 12548 > ckpts/CKPT_DIR/log.txt 2>&1
@@ -69,7 +68,6 @@ python -u main.py --dataset-path data/FB15K-237/ --cuda \
 ```
 python -u main.py --dataset-path data/WN18RR/ --cuda \
 --save-dir ckpts/CKPT_DIR/ --sampling-type minerva \
---embed-dim 320 --n-attn-heads 8 --n-bert-layers 3 \
 --lr 0.00175 --label-smoothing 0.1 --warmup 0.1 \
 --batch-size 256 --n-epochs 500 \
 --patience 100 --beam-size 40 --add-segment-embed --add-inverse-rels \
@@ -83,8 +81,8 @@ python -u main.py --dataset-path data/WN18RR/ --cuda \
 python eval.py --dataset-path <DATA_PATH> --cuda \
 --ckpt-path ckpts/CKPT_DIR/model.pt \
 --split <valid/test> --sampling-type minerva \
---graph-connection type_1 --embed-dim 320 --n-attn-heads 8 \
---n-bert-layers 3 [--beam-size <>] [--add-segment-embed] [--add-inverse-rels]
+--graph-connection type_1  \
+[--beam-size <>] [--add-segment-embed] [--add-inverse-rels]
 ```
 
 
