@@ -1,4 +1,6 @@
 # KG-R3
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-retrieve-and-read-framework-for-knowledge/link-prediction-on-fb15k-237)](https://paperswithcode.com/sota/link-prediction-on-fb15k-237?p=a-retrieve-and-read-framework-for-knowledge)
+
 Code for the CIKM'23 paper ["A Retrieve-and-Read Framework for Knowledge Graph Link Prediction"](https://arxiv.org/pdf/2212.09724.pdf) [ACM link](https://dl.acm.org/doi/10.1145/3583780.3614769)
 
 <!-- Code will be released soon. -->
